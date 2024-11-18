@@ -131,7 +131,7 @@ def executar_acao(entidade: str, opcao: str) -> None:
     """
     limpar_console()  # Limpa o console antes de exibir o menu principal
     imprimir_cabecalho(f"{entidade} - {acoes[opcao]}")  # Exibe um cabeçalho para a ação específica
-    input("\nPressione uma tecla para continuar...")
+    input("\nPressione uma enter para continuar...")
 
 
 # ===================== INICIALIZAÇÃO ===================== #
