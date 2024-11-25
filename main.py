@@ -1,6 +1,8 @@
+
 import os
 import platform
 import time
+import json
 
 """
 Módulo de gerenciamento de sistema acadêmico.
@@ -35,6 +37,31 @@ def imprimir_cabecalho(titulo: str) -> None:
     """
     print(f"####### {titulo.upper()} ######")
 
+
+# ===================== GERENCIAMENTO DE DADOS ===================== #
+
+DADOS_PATH = 'dados.json'
+
+def carregar_dados() -> dict:
+    """
+    Carrega os dados do arquivo JSON.
+
+    @return {dict} Um dicionário com os dados carregados.
+    """
+    if not os.path.exists(DADOS_PATH):
+        return {entidade: [] for entidade in entidades.values()}
+    
+    with open(DADOS_PATH, 'r') as arquivo:
+        return json.load(arquivo)
+
+def salvar_dados(dados: dict) -> None:
+    """
+    Salva os dados no arquivo JSON.
+
+    @param {dict} dados - Um dicionário com os dados a serem salvos.
+    """
+    with open(DADOS_PATH, 'w') as arquivo:
+        json.dump(dados, arquivo, indent=4)
 
 # ======================== DOMÍNIO ======================== #
 
@@ -129,10 +156,48 @@ def executar_acao(entidade: str, opcao: str) -> None:
     @param {str} entidade - Nome da entidade para a qual a ação será realizada.
     @param {str} opcao - A ação selecionada (Incluir, Listar, Atualizar, Excluir).
     """
-    limpar_console()  # Limpa o console antes de exibir o menu principal
-    imprimir_cabecalho(f"{entidade} - {acoes[opcao]}")  # Exibe um cabeçalho para a ação específica
-    input("\nPressione uma enter para continuar...")
-
+    dados = carregar_dados()
+    if opcao == '1':  # Incluir
+        novo_item = input(f"Informe os dados do novo {entidade[:-1]}: ")
+        dados[entidade].append(novo_item)
+        salvar_dados(dados)
+        print(f"{entidade[:-1].capitalize()} incluído com sucesso!")
+    elif opcao == '2':  # Listar
+        if not dados[entidade]:
+            print(f"Não há {entidade} cadastrados.")
+        else:
+            print(f"Lista de {entidade}:")
+            for idx, item in enumerate(dados[entidade], start=1):
+                print(f"{idx}. {item}")
+    elif opcao == '3':  # Atualizar
+        if not dados[entidade]:
+            print(f"Não há {entidade} cadastrados.")
+        else:
+            for idx, item in enumerate(dados[entidade], start=1):
+                print(f"{idx}. {item}")
+            indice = int(input("Informe o número do item que deseja atualizar: ")) - 1
+            if 0 <= indice < len(dados[entidade]):
+                novo_valor = input(f"Informe o novo valor para {entidade[:-1]}: ")
+                dados[entidade][indice] = novo_valor
+                salvar_dados(dados)
+                print(f"{entidade[:-1].capitalize()} atualizado com sucesso!")
+            else:
+                print("Índice inválido.")
+    elif opcao == '4':  # Excluir
+        if not dados[entidade]:
+            print(f"Não há {entidade} cadastrados.")
+        else:
+            for idx, item in enumerate(dados[entidade], start=1):
+                print(f"{idx}. {item}")
+            indice = int(input("Informe o número do item que deseja excluir: ")) - 1
+            if 0 <= indice < len(dados[entidade]):
+                dados[entidade].pop(indice)
+                salvar_dados(dados)
+                print(f"{entidade[:-1].capitalize()} excluído com sucesso!")
+            else:
+                print("Índice inválido.")
+    
+    input("\nPressione enter para continuar...")
 
 # ===================== INICIALIZAÇÃO ===================== #
 
